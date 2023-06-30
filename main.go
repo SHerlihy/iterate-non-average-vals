@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -133,7 +134,7 @@ func findMatchingPairs(maxSize int, indicies1 []int, indicies2 []int) [][2]int {
 		binSlice[i] = true
 	}
 
-	maxInt := binSliceToInt(binSlice)
+	maxInt := BinSliceToInt(binSlice)
 
 	//completeMatch := new(Int).SetInt(maxInt)
 	completeMatch := int(maxInt)
@@ -190,36 +191,51 @@ func generateUsableFragment(fragment ArrangedFrag) UsableFragment {
 	return usableFrag
 }
 
-func binSliceToInt(binSlice []bool) int {
+func BinSliceToInt(binSlice []bool) int {
 	ret := 0
-	size := len(binSlice)
+	finalIdx := len(binSlice) - 1
 
 	for i, bin := range binSlice {
 		if bin == false {
 			continue
 		}
 
-		binIdx := float64(size - i)
-		ret = ret + int(math.Pow(binIdx, 2))
+		binIdx := float64(finalIdx - i)
+		ret = ret + int(math.Pow(2, binIdx))
 	}
 
 	return ret
 }
 
-func intToBinSlice(num int) []bool {
+func IntToBinSlice(num int) []bool {
+	if num == 0 {
+		return []bool{false}
+	}
+
 	fltN := float64(num)
 	exponent := int(math.Floor(math.Log(fltN) / math.Log(2)))
+	fmt.Print(exponent)
 
-	binSlice := make([]bool, exponent)
+	binSlice := make([]bool, exponent+1)
 
 	for i := exponent; i != 0; i-- {
 		deduct := math.Pow(float64(2), float64(i))
 
 		remainder := int(fltN - deduct)
 
-		if remainder > 0 {
+		if remainder >= 0 {
+			fltN = float64(remainder)
 			binSlice[exponent-i] = true
 		}
+	}
+
+	deduct := float64(1)
+
+	remainder := int(fltN - deduct)
+
+	if remainder >= 0 {
+		fltN = float64(remainder)
+		binSlice[exponent] = true
 	}
 
 	return binSlice
@@ -231,7 +247,7 @@ func generateFragment(nums []int) (ArrangedFrag, int) {
 	arrangedFrag := []int{}
 	accessedIndicies := 0
 
-	binSlice := intToBinSlice(len(nums))
+	binSlice := IntToBinSlice(len(nums))
 
 	for i, _ := range nums {
 		randIdx := rand.Intn(numsLen)
@@ -261,7 +277,7 @@ func generateFragment(nums []int) (ArrangedFrag, int) {
 		arrangedFrag = append(arrangedFrag, nums[randIdx])
 	}
 
-	accessedIndicies = binSliceToInt(binSlice)
+	accessedIndicies = BinSliceToInt(binSlice)
 
 	return arrangedFrag, accessedIndicies
 }
