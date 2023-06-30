@@ -19,7 +19,7 @@ type BinaryToFragments map[int][]UsableFragment
 
 type SizedUsedIndicies map[int][]int
 
-func rearrangeArray(nums []int) []int {
+func RearrangeArray(nums []int) []int {
 	var binToFrags BinaryToFragments
 	var sizeToIndicies SizedUsedIndicies
 
@@ -33,7 +33,7 @@ func rearrangeArray(nums []int) []int {
 
 func iterateForArrangedValues(nums []int, maxSize int, sizeToIndicies SizedUsedIndicies, binToFrags BinaryToFragments) ArrangedFrag {
 	for i := 0; i < len(nums); i++ {
-		genFrag, genIndicies := generateFragment(nums)
+		genFrag, genIndicies := GenerateFragment(nums)
 
 		size := len(genFrag)
 		if size < 3 {
@@ -85,7 +85,7 @@ func matchTwoParts(maxSize int, sizeToIndicies SizedUsedIndicies, binToFrags Bin
 			continue
 		}
 
-		arrangedVals := calculateCompletePair(maxSize, binToFrags, mostIndicies, fewerIndicies)
+		arrangedVals := CalculateCompletePair(maxSize, binToFrags, mostIndicies, fewerIndicies)
 
 		if len(arrangedVals) == maxSize {
 			return arrangedVals
@@ -95,8 +95,8 @@ func matchTwoParts(maxSize int, sizeToIndicies SizedUsedIndicies, binToFrags Bin
 	return matchedFragment
 }
 
-func calculateCompletePair(maxSize int, binToFrags BinaryToFragments, indicies1 []int, indicies2 []int) ArrangedFrag {
-	matchingPairs := findMatchingPairs(maxSize, indicies1, indicies2)
+func CalculateCompletePair(maxSize int, binToFrags BinaryToFragments, indicies1 []int, indicies2 []int) ArrangedFrag {
+	matchingPairs := FindMatchingPairs(maxSize, indicies1, indicies2)
 
 	for _, pair := range matchingPairs {
 		lIndicies := pair[0]
@@ -126,35 +126,6 @@ func calculateCompletePair(maxSize int, binToFrags BinaryToFragments, indicies1 
 	}
 
 	return []int{}
-}
-
-func findMatchingPairs(maxSize int, indicies1 []int, indicies2 []int) [][2]int {
-	binSlice := make([]bool, maxSize)
-	for i := range binSlice {
-		binSlice[i] = true
-	}
-
-	maxInt := BinSliceToInt(binSlice)
-
-	//completeMatch := new(Int).SetInt(maxInt)
-	completeMatch := int(maxInt)
-
-	var matchingIndicies [][2]int
-
-	for _, lIndicies := range indicies1 {
-		for _, sIndicies := range indicies2 {
-			lsIndicies := lIndicies ^ sIndicies
-			remainingIndicies := completeMatch & lsIndicies
-
-			if remainingIndicies != completeMatch {
-				continue
-			}
-
-			matchingIndicies = append(matchingIndicies, [2]int{lIndicies, sIndicies})
-		}
-	}
-
-	return matchingIndicies
 }
 
 func stitchFragments(uFrag1 UsableFragment, uFrag2 UsableFragment) ArrangedFrag {
@@ -189,6 +160,82 @@ func generateUsableFragment(fragment ArrangedFrag) UsableFragment {
 	usableFrag := UsableFragment{leftInvalid, rightInvalid, fragment}
 
 	return usableFrag
+}
+
+func GenerateFragment(nums []int) (ArrangedFrag, int) {
+	numsLen := len(nums)
+
+	arrangedFrag := []int{}
+	accessedIndicies := 0
+
+    binSlice := make([]bool, numsLen)
+
+	for i, _ := range nums {
+		randIdx := rand.Intn(numsLen)
+
+        for {
+            if binSlice[randIdx] == false {
+                break
+            }
+            randIdx = rand.Intn(numsLen)
+        }
+
+
+		if i < 2 {
+			binSlice[randIdx] = true
+			arrangedFrag = append(arrangedFrag, nums[randIdx])
+            continue
+		}
+
+		var prev int
+		var sub int
+		var next int
+
+		prev = arrangedFrag[i-2]
+		sub = arrangedFrag[i-1]
+		next = nums[randIdx]
+
+		avg := (prev + next) / 2
+
+		if sub == avg {
+			break
+		}
+
+		binSlice[randIdx] = true
+		arrangedFrag = append(arrangedFrag, nums[randIdx])
+	}
+
+	accessedIndicies = BinSliceToInt(binSlice)
+
+	return arrangedFrag, accessedIndicies
+}
+
+func FindMatchingPairs(maxSize int, indicies1 []int, indicies2 []int) [][2]int {
+	binSlice := make([]bool, maxSize)
+	for i := range binSlice {
+		binSlice[i] = true
+	}
+
+	maxInt := BinSliceToInt(binSlice)
+
+	completeMatch := int(maxInt)
+
+	var matchingIndicies [][2]int
+
+	for _, lIndicies := range indicies1 {
+		for _, sIndicies := range indicies2 {
+			lsIndicies := lIndicies ^ sIndicies
+			remainingIndicies := completeMatch & lsIndicies
+
+			if remainingIndicies != completeMatch {
+				continue
+			}
+
+			matchingIndicies = append(matchingIndicies, [2]int{lIndicies, sIndicies})
+		}
+	}
+
+	return matchingIndicies
 }
 
 func BinSliceToInt(binSlice []bool) int {
@@ -239,45 +286,4 @@ func IntToBinSlice(num int) []bool {
 	}
 
 	return binSlice
-}
-
-func generateFragment(nums []int) (ArrangedFrag, int) {
-	numsLen := len(nums)
-
-	arrangedFrag := []int{}
-	accessedIndicies := 0
-
-	binSlice := IntToBinSlice(len(nums))
-
-	for i, _ := range nums {
-		randIdx := rand.Intn(numsLen)
-
-		binSlice[randIdx] = true
-
-		if i < 2 {
-			binSlice[randIdx] = true
-			arrangedFrag = append(arrangedFrag, nums[randIdx])
-		}
-
-		var prev int
-		var sub int
-		var next int
-
-		prev = arrangedFrag[i-2]
-		sub = arrangedFrag[i-1]
-		next = nums[randIdx]
-
-		avg := (prev + next) / 2
-
-		if sub == avg {
-			break
-		}
-
-		binSlice[randIdx] = true
-		arrangedFrag = append(arrangedFrag, nums[randIdx])
-	}
-
-	accessedIndicies = BinSliceToInt(binSlice)
-
-	return arrangedFrag, accessedIndicies
 }
