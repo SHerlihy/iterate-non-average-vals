@@ -19,16 +19,16 @@ type CalculateCompletePairData struct {
     ShortIndicies []int
 }
 
-//func TestRearrangeArray(t *testing.T){
-//    averageSlice := []int{1,2,3,4,5,6}
-//    nonAverageSlice := RearrangeArray(averageSlice)
-//
-//    t.Log(nonAverageSlice)
-//
-//    if len(nonAverageSlice) != len(averageSlice){
-//        t.Errorf("Length incorrect: %v", nonAverageSlice)
-//    }
-//}
+func TestRearrangeArray(t *testing.T){
+    averageSlice := []int{1,2,3,4,5,6}
+    nonAverageSlice := RearrangeArray(averageSlice)
+
+    t.Log(nonAverageSlice)
+
+    if len(nonAverageSlice) != len(averageSlice){
+        t.Errorf("Length incorrect: %v", nonAverageSlice)
+    }
+}
 
 func TestGenerateFragment(t *testing.T){
     averageSlice := []int{1,2,3,4,5,6}

@@ -20,8 +20,8 @@ type BinaryToFragments map[int][]UsableFragment
 type SizedUsedIndicies map[int][]int
 
 func RearrangeArray(nums []int) []int {
-	var binToFrags BinaryToFragments
-	var sizeToIndicies SizedUsedIndicies
+    binToFrags := make(BinaryToFragments)
+    sizeToIndicies := make(SizedUsedIndicies)
 
 	maxSize := len(nums)
 	rand.Seed(time.Now().UnixNano())
@@ -60,11 +60,23 @@ func iterateForArrangedValues(nums []int, maxSize int, sizeToIndicies SizedUsedI
 
 	}
 
+    sizeCaps, ok := sizeToIndicies[len(nums)]
+
+    if ok {
+        capFrags, ok := binToFrags[sizeCaps[0]]
+
+        if ok {
+            return capFrags[0].Frag
+        }
+    }
+
+    fmt.Printf("\nFrom iterate. SizeIndicies: %v, BinFrags: %v", sizeToIndicies, binToFrags)
+
 	matchedFragment := matchTwoParts(maxSize, sizeToIndicies, binToFrags)
 
-	if len(matchedFragment) < len(nums) {
-		iterateForArrangedValues(nums, maxSize, sizeToIndicies, binToFrags)
-	}
+//	if len(matchedFragment) < len(nums) {
+//		iterateForArrangedValues(nums, maxSize, sizeToIndicies, binToFrags)
+//	}
 
 	return matchedFragment
 }
